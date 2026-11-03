@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:title" content="Un frasco para vos">
+<meta property="og:description" content="Toca el frasco">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+<title>Frasco de razones</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Jost:wght@300;400;500&display=swap">
+<style>
+  /* Layout: misma noche vino de la invitación; el frasco al centro, debajo la nota que sale de él. Tema único y oscuro a propósito. */
+  :root {
+    --night: #1a0b12;
+    --wine: #3a1322;
+    --petal: #e2557a;
+    --blush: #f6c9d4;
+    --ink: #fbeef1;
+    --muted: #c99aa8;
+    --paper: #fdfbfa;
+    --paper-ink: #4d4448;
+    --border: #e8837f;
+    --num: #4a90d9;
+    --display: "Pinyon Script", "Brush Script MT", cursive;
+    --body: "Jost", "Segoe UI", system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  html, body { min-height: 100%; }
+  body {
+    background: radial-gradient(120% 80% at 50% 20%, var(--wine), var(--night) 70%);
+    background-color: var(--night);
+    color: var(--ink);
+    font-family: var(--body);
+    font-weight: 300;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 28px 40px;
+    overflow-x: hidden;
+  }
+  main {
+    max-width: 440px; margin: 0 auto;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    text-align: center;
+  }
+  .para { font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(44px, 13vw, 58px); line-height: 1.05; margin: 0; color: var(--blush); }
+  .intro { font-size: 16px; line-height: 1.6; margin: 0; max-width: 34ch; text-wrap: balance; }
+  .intro b { font-weight: 500; color: var(--blush); }
+
+  .frasco {
+    background: none; border: 0; padding: 0; cursor: pointer;
+    width: min(220px, 60vw);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .frasco:focus-visible { outline: 2px solid var(--blush); outline-offset: 6px; border-radius: 16px; }
+  .frasco svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .frasco.agitar svg { animation: agitar .5s ease-in-out; }
+  @keyframes agitar {
+    0%, 100% { transform: rotate(0); }
+    20% { transform: rotate(-7deg); }
+    45% { transform: rotate(6deg); }
+    70% { transform: rotate(-3deg); }
+  }
+  .papelito.sale { transform-box: fill-box; transform-origin: center; animation: salir .7s ease-in forwards; }
+  @keyframes salir { to { transform: translateY(-190px) rotate(200deg) scale(1.4); opacity: 0; } }
+
+  .corazon { transform-box: fill-box; transform-origin: center; animation: subir var(--dur) var(--del) ease-out both; }
+  @keyframes subir {
+    from { transform: translateY(0) scale(.3); opacity: 0; }
+    15% { opacity: 1; }
+    to { transform: translate(var(--dx), -230px) scale(1.2); opacity: 0; }
+  }
+  .final.nuevo { animation: desdoblar .8s ease-out both; }
+  .final .pistaSab { font-size: 15px; color: var(--blush); }
+
+  .pista { font-size: 13px; letter-spacing: .25em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  .pista b { color: var(--blush); font-weight: 500; }
+
+  /* Nota con doble borde rosado y número azul, como las notas que ella escribió */
+  .nota {
+    width: min(320px, 92%);
+    background: var(--paper); color: var(--paper-ink);
+    border: 4px double var(--border);
+    padding: 14px 18px 18px;
+    text-align: left; font-weight: 400; font-size: 16px; line-height: 1.55;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+    transform-origin: top;
+  }
+  .nota.nueva { animation: desdoblar .7s cubic-bezier(.3,1.2,.5,1) both; }
+  @keyframes desdoblar { from { transform: translateY(-30px) scale(.4) rotate(-6deg); opacity: 0; } to { transform: none; opacity: 1; } }
+  .nota p { margin: 0 0 8px; }
+  .nota p:last-child { margin: 0; }
+  .nota .num { font-weight: 500; color: var(--num); letter-spacing: .05em; }
+  .nota .tit { font-weight: 500; font-size: 17px; }
+  .nota .tit span { color: var(--border); }
+
+  .final { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .final .grande { font-family: var(--display); font-size: clamp(36px, 10vw, 46px); color: var(--petal); margin: 0; line-height: 1.15; }
+  .final p { margin: 0; font-size: 16px; }
+  .otra {
+    margin-top: 6px;
+    font: 400 13px var(--body); letter-spacing: .15em; text-transform: uppercase;
+    color: var(--ink); background: none; border: 1px solid rgba(246, 201, 212, .4);
+    border-radius: 999px; padding: 10px 20px; cursor: pointer;
+  }
+  .otra:focus-visible { outline: 2px solid var(--blush); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .frasco.agitar svg, .papelito.sale, .nota.nueva, .final.nuevo { animation: none; }
+    .corazon { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <p class="para">Para vos, mi amor</p>
+  <h1>Frasco de razones</h1>
+  <p class="intro">Tus notas llegaron hasta la <b>#11</b> y yo te di la <b>#12</b>. Seguí contando, y en este frasco guardé <b>ocho razones más</b>.</p>
+
+  <button type="button" class="frasco" id="frasco" aria-label="Sacar una razón del frasco">
+    <svg viewBox="0 0 220 260" aria-hidden="true">
+      <rect x="66" y="22" width="88" height="30" rx="6" fill="#c4284f"/>
+      <rect x="66" y="22" width="88" height="8" rx="4" fill="#e2557a"/>
+      <path d="M72 52 H148 V64 C 176 72, 184 92, 184 118 V226 Q184 248 162 248 H58 Q36 248 36 226 V118 C 36 92, 44 72, 72 64 Z" fill="rgba(246,201,212,.08)" stroke="rgba(246,201,212,.55)" stroke-width="3"/>
+      <g id="papelitos"></g>
+      <g id="corazones"></g>
+      <path d="M52 112 C 50 150, 50 190, 54 228" stroke="rgba(255,255,255,.25)" stroke-width="6" stroke-linecap="round" fill="none"/>
+      <path d="M110 52 C 92 40, 84 52, 96 58 M110 52 C 128 40, 136 52, 124 58" stroke="#f6c9d4" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <p class="pista" id="pista">Toca el frasco</p>
+
+  <article class="nota" id="nota" hidden aria-live="polite"></article>
+
+  <div class="final" id="final" hidden>
+    <p class="grande">Mañana es 4…</p>
+    <p>y mañana te cuento las cositas.</p>
+    <p class="pistaSab">Pista: no hagás planes para el sábado 😉</p>
+    <p>Te amo.</p>
+    <button type="button" class="otra" id="otraVez">Leerlas otra vez</button>
+  </div>
+</main>
+
+<script>
+  // Las razones siguen la numeración de las notas de ella (llegó a la #11; la #12 está en la invitación)
+  const razones = [
+    ['Tu risa', 'Cuando te reís de verdad, se me olvida cualquier cosa mala del día.'],
+    ['Cómo me cuidás', 'Siempre estás pendiente de mí, hasta en los detalles más chiquitos.'],
+    ['Tus abrazos', 'Son mi lugar favorito. Ahí todo se siente en calma.'],
+    ['Tus notas', 'Me escribiste once razones, una por una. Nadie había hecho algo así por mí.'],
+    ['Tu forma de ser', 'Sos auténtica, y eso es lo que más admiro de vos.'],
+    ['Lo que viene', 'Me ilusiona todo lo que todavía nos falta vivir juntos.'],
+    ['Porque te elijo', 'Cada mes que pasa, te vuelvo a elegir. Y te voy a seguir eligiendo.'],
+    ['Lo que siento', 'Estoy sumamente enamorado de vos, y me encanta hacerte sentir la persona más amada del mundo. Porque lo sos.'],
+  ];
+  const PRIMERA = 13;
+
+  const $ = id => document.getElementById(id);
+  const ns = 'http://www.w3.org/2000/svg';
+  const colores = ['#fdfbfa', '#f6c9d4', '#f4a3b5', '#ffe3a8', '#e2557a', '#fdfbfa', '#f6c9d4', '#ffe3a8'];
+  let siguiente = 0;
+
+  // Papelitos doblados apilados al fondo del frasco, uno por razón
+  function llenar() {
+    const g = $('papelitos');
+    g.replaceChildren();
+    razones.forEach((_, i) => {
+      const x = 58 + (i % 4) * 26 + (i > 3 ? 13 : 0);
+      const y = 222 - Math.floor(i / 4) * 24 - (i % 2) * 6;
+      const r = document.createElementNS(ns, 'rect');
+      Object.entries({ class: 'papelito', x: x - 16, y: y - 9, width: 32, height: 18, rx: 2, fill: colores[i], stroke: 'rgba(77,68,72,.35)', 'stroke-width': 1, transform: `rotate(${(i * 37) % 50 - 25} ${x} ${y})` })
+        .forEach(([k, v]) => r.setAttribute(k, v));
+      g.appendChild(r);
+    });
+  }
+
+  // Al vaciarse, el frasco se llena de corazones que suben flotando
+  function soltarCorazones() {
+    const g = $('corazones');
+    g.replaceChildren();
+    for (let i = 0; i < 16; i++) {
+      const x = 60 + Math.random() * 100, y = 200 + Math.random() * 40, s = .7 + Math.random() * .8;
+      const p = document.createElementNS(ns, 'path');
+      p.setAttribute('class', 'corazon');
+      p.setAttribute('d', `M${x} ${y + 6 * s} c ${-10 * s} ${-7 * s}, ${-7 * s} ${-16 * s}, 0 ${-11 * s} c ${7 * s} ${-5 * s}, ${10 * s} ${4 * s}, 0 ${11 * s} Z`);
+      p.setAttribute('fill', ['#e2557a', '#f6c9d4', '#f4a3b5', '#c4284f'][i % 4]);
+      p.style.setProperty('--dx', (Math.random() * 80 - 40) + 'px');
+      p.style.setProperty('--dur', (2 + Math.random() * 1.5) + 's');
+      p.style.setProperty('--del', (Math.random() * 1.2) + 's');
+      g.appendChild(p);
+    }
+  }
+
+  function sacar() {
+    if (siguiente >= razones.length) return;
+    const frasco = $('frasco');
+    frasco.classList.remove('agitar');
+    void frasco.offsetWidth;
+    frasco.classList.add('agitar');
+    const papeles = $('papelitos').querySelectorAll('.papelito:not(.sale)');
+    papeles[papeles.length - 1]?.classList.add('sale');
+
+    const [titulo, texto] = razones[siguiente];
+    const nota = $('nota');
+    nota.innerHTML = `<p class="num">#${PRIMERA + siguiente}</p><p class="tit"><span aria-hidden="true">♥</span> ${titulo}</p><p>${texto}</p>`;
+    nota.hidden = false;
+    nota.classList.remove('nueva');
+    void nota.offsetWidth;
+    nota.classList.add('nueva');
+    siguiente++;
+
+    const quedan = razones.length - siguiente;
+    $('pista').innerHTML = quedan ? `Quedan <b>${quedan}</b>. Toca otra vez` : 'Ya no quedan papelitos';
+    if (!quedan) {
+      soltarCorazones();
+      // el final aparece cuando los corazones ya van subiendo
+      setTimeout(() => {
+        const fin = $('final');
+        fin.hidden = false;
+        fin.classList.remove('nuevo');
+        void fin.offsetWidth;
+        fin.classList.add('nuevo');
+      }, 1200);
+    }
+    frasco.setAttribute('aria-label', quedan ? 'Sacar otra razón del frasco' : 'El frasco está vacío');
+  }
+
+  $('frasco').addEventListener('click', sacar);
+  $('otraVez').addEventListener('click', () => {
+    siguiente = 0;
+    llenar();
+    $('corazones').replaceChildren();
+    $('nota').hidden = true;
+    $('final').hidden = true;
+    $('pista').textContent = 'Toca el frasco';
+    $('frasco').setAttribute('aria-label', 'Sacar una razón del frasco');
+  });
+  llenar();
+</script>
+</body>
+</html>
