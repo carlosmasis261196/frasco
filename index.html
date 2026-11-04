@@ -71,7 +71,6 @@
     to { transform: translate(var(--dx), -230px) scale(1.2); opacity: 0; }
   }
   .final.nuevo { animation: desdoblar .8s ease-out both; }
-  .final .pistaSab { font-size: 15px; color: var(--blush); }
 
   .pista { font-size: 13px; letter-spacing: .25em; text-transform: uppercase; color: var(--muted); margin: 0; }
   .pista b { color: var(--blush); font-weight: 500; }
@@ -97,6 +96,21 @@
   .final { display: flex; flex-direction: column; align-items: center; gap: 10px; }
   .final .grande { font-family: var(--display); font-size: clamp(36px, 10vw, 46px); color: var(--petal); margin: 0; line-height: 1.15; }
   .final p { margin: 0; font-size: 16px; }
+  /* Polaroid: marco blanco con la fecha escrita abajo */
+  .polaroid {
+    margin: 4px 0 10px;
+    width: min(300px, 88%);
+    background: var(--paper);
+    padding: 10px 10px 14px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, .45);
+    transform: rotate(-3deg);
+  }
+  .polaroid img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; }
+  .polaroid figcaption { font-family: var(--display); font-size: 24px; color: var(--paper-ink); margin-top: 8px; }
+  .nota.esFoto { background: none; border: 0; box-shadow: none; padding: 0; display: flex; justify-content: center; }
+  .nota.esFoto.nueva { animation: none; }
+  .nota.esFoto.nueva .polaroid { animation: caerFoto 1s cubic-bezier(.3,1.3,.5,1) both; }
+  @keyframes caerFoto { from { transform: translateY(-60px) rotate(-14deg) scale(.7); opacity: 0; } to { transform: rotate(-3deg); opacity: 1; } }
   .otra {
     margin-top: 6px;
     font: 400 13px var(--body); letter-spacing: .15em; text-transform: uppercase;
@@ -106,7 +120,7 @@
   .otra:focus-visible { outline: 2px solid var(--blush); outline-offset: 3px; }
 
   @media (prefers-reduced-motion: reduce) {
-    .frasco.agitar svg, .papelito.sale, .nota.nueva, .final.nuevo { animation: none; }
+    .frasco.agitar svg, .papelito.sale, .nota.nueva, .final.nuevo, .nota.esFoto.nueva .polaroid { animation: none; }
     .corazon { display: none; }
   }
 </style>
@@ -116,7 +130,7 @@
 <main>
   <p class="para">Para vos, mi amor</p>
   <h1>Frasco de razones</h1>
-  <p class="intro">Tus notas llegaron hasta la <b>#11</b> y yo te di la <b>#12</b>. Seguí contando, y en este frasco guardé <b>ocho razones más</b>.</p>
+  <p class="intro">Tus notas llegaron hasta la <b>#11</b> y yo te di la <b>#12</b>. Seguí contando, y en este frasco guardé <b>ocho razones más</b> y una sorpresa.</p>
 
   <button type="button" class="frasco" id="frasco" aria-label="Sacar una razón del frasco">
     <svg viewBox="0 0 220 260" aria-hidden="true">
@@ -136,7 +150,7 @@
   <div class="final" id="final" hidden>
     <p class="grande">Mañana es 4…</p>
     <p>y mañana te cuento las cositas.</p>
-    <p class="pistaSab">Pista: no hagás planes para el sábado 😉</p>
+    <p>Dormí rico, que mañana te veo 💗</p>
     <p>Te amo.</p>
     <button type="button" class="otra" id="otraVez">Leerlas otra vez</button>
   </div>
@@ -145,14 +159,15 @@
 <script>
   // Las razones siguen la numeración de las notas de ella (llegó a la #11; la #12 está en la invitación)
   const razones = [
-    ['Tu risa', 'Cuando te reís de verdad, se me olvida cualquier cosa mala del día.'],
-    ['Cómo me cuidás', 'Siempre estás pendiente de mí, hasta en los detalles más chiquitos.'],
-    ['Tus abrazos', 'Son mi lugar favorito. Ahí todo se siente en calma.'],
+    ['Tus sonrisas', 'Siempre me ha encantado hacerte feliz y sacarte sonrisas con mis ocurrencias y mis chistes malos. Tu risa es mi premio.'],
+    ['Cantar en el carro', 'Ir cantando juntos en el carro es de mis momentos favoritos.'],
+    ['Pensamos igual', 'Cuando nos ponemos a juzgar cosas juntos, siempre nos damos cuenta de que pensamos exactamente lo mismo.'],
+    ['Mi soporte', 'Te agradezco tanto estos meses. Sin duda has sido mi soporte para mucho, y eso es lo que importa muchooo: todo tu amor.'],
     ['Tus notas', 'Me escribiste once razones, una por una. Nadie había hecho algo así por mí.'],
-    ['Tu forma de ser', 'Sos auténtica, y eso es lo que más admiro de vos.'],
-    ['Lo que viene', 'Me ilusiona todo lo que todavía nos falta vivir juntos.'],
     ['Porque te elijo', 'Cada mes que pasa, te vuelvo a elegir. Y te voy a seguir eligiendo.'],
+    ['Ya quiero que sea mañana', 'Ya quiero que sea mañana para verte, darte muchos besos y algo de corazón.'],
     ['Lo que siento', 'Estoy sumamente enamorado de vos, y me encanta hacerte sentir la persona más amada del mundo. Porque lo sos.'],
+    'foto',
   ];
   const PRIMERA = 13;
 
@@ -169,7 +184,9 @@
       const x = 58 + (i % 4) * 26 + (i > 3 ? 13 : 0);
       const y = 222 - Math.floor(i / 4) * 24 - (i % 2) * 6;
       const r = document.createElementNS(ns, 'rect');
-      Object.entries({ class: 'papelito', x: x - 16, y: y - 9, width: 32, height: 18, rx: 2, fill: colores[i], stroke: 'rgba(77,68,72,.35)', 'stroke-width': 1, transform: `rotate(${(i * 37) % 50 - 25} ${x} ${y})` })
+      // el papelito de la foto es dorado; se saca al final, así que es el primero dibujado
+      const fill = razones[razones.length - 1 - i] === 'foto' ? '#ffcf5c' : colores[i % colores.length];
+      Object.entries({ class: 'papelito', x: x - 16, y: y - 9, width: 32, height: 18, rx: 2, fill, stroke: 'rgba(77,68,72,.35)', 'stroke-width': 1, transform: `rotate(${(i * 37) % 50 - 25} ${x} ${y})` })
         .forEach(([k, v]) => r.setAttribute(k, v));
       g.appendChild(r);
     });
@@ -192,6 +209,39 @@
     }
   }
 
+  // Cajita musical: melodía corta que suena solo al abrir el papelito dorado (el toque permite el audio)
+  function tocarCajita() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const salida = ctx.createGain();
+      salida.gain.value = .9;
+      const eco = ctx.createDelay(); eco.delayTime.value = .28;
+      const ret = ctx.createGain(); ret.gain.value = .3;
+      salida.connect(ctx.destination);
+      salida.connect(eco).connect(ret).connect(eco);
+      ret.connect(ctx.destination);
+      const nota = (t, midi, dur, vol) => {
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + .008);
+        g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        g.connect(salida);
+        for (const [mult, v] of [[1, 1], [3, .08]]) {
+          const o = ctx.createOscillator(), gv = ctx.createGain();
+          o.frequency.value = 440 * 2 ** ((midi - 69) / 12) * mult;
+          gv.gain.value = v;
+          o.connect(gv).connect(g);
+          o.start(t); o.stop(t + dur);
+        }
+      };
+      const melodia = [84, 88, 91, 88, 86, 84, 86, 88, 84, 79, 81, 84];
+      const t0 = ctx.currentTime + .05, paso = .24;
+      melodia.forEach((m, i) => nota(t0 + i * paso, m, i === melodia.length - 1 ? 2.5 : 1.2, .12));
+      [[48, 0], [53, 4], [55, 8], [48, 11]].forEach(([m, i]) => nota(t0 + i * paso, m + 12, 2, .07));
+      setTimeout(() => ctx.close(), 7000);
+    } catch (e) { /* sin audio, la foto igual aparece */ }
+  }
+
   function sacar() {
     if (siguiente >= razones.length) return;
     const frasco = $('frasco');
@@ -201,9 +251,16 @@
     const papeles = $('papelitos').querySelectorAll('.papelito:not(.sale)');
     papeles[papeles.length - 1]?.classList.add('sale');
 
-    const [titulo, texto] = razones[siguiente];
     const nota = $('nota');
-    nota.innerHTML = `<p class="num">#${PRIMERA + siguiente}</p><p class="tit"><span aria-hidden="true">♥</span> ${titulo}</p><p>${texto}</p>`;
+    const esFoto = razones[siguiente] === 'foto';
+    if (esFoto) {
+      tocarCajita();
+      nota.innerHTML = `<figure class="polaroid"><img src="nosotros.jpg" alt="Selfie de los dos, ella tirando un beso y él con gorra y lentes" width="1600" height="1066"><figcaption>14 de diciembre de 2024</figcaption></figure>`;
+    } else {
+      const [titulo, texto] = razones[siguiente];
+      nota.innerHTML = `<p class="num">#${PRIMERA + siguiente}</p><p class="tit"><span aria-hidden="true">♥</span> ${titulo}</p><p>${texto}</p>`;
+    }
+    nota.classList.toggle('esFoto', esFoto);
     nota.hidden = false;
     nota.classList.remove('nueva');
     void nota.offsetWidth;
